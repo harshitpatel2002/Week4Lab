@@ -18,5 +18,6 @@
             Contents: <textarea name="content" rows="10" cols="30"></textarea><br>
             <input type="submit" value="Save">
         </form>
+        <p style="color: red">${emptyInput}</p>
     </body>
 </html>

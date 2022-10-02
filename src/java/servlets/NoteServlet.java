@@ -38,30 +38,57 @@ public class NoteServlet extends HttpServlet
         {
             e.printStackTrace();
         }
-        getServletContext().getRequestDispatcher("/WEB-INF/viewnote.jsp")
-                .forward(request, response);
+        String edit = request.getParameter("edit");
+
+        if (edit != null)
+        {
+            getServletContext().getRequestDispatcher("/WEB-INF/editnote.jsp")
+                    .forward(request, response);
+        } else
+        {
+            getServletContext().getRequestDispatcher("/WEB-INF/viewnote.jsp")
+                    .forward(request, response);
+        }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
+//        Creating a note object
+        Note note2 = null;
+        
 //        Saving the note to the file
-        String title = (String) request.getAttribute("title");
-        String content = (String) request.getAttribute("content");
-
-        try
+        String title = request.getParameter("title");
+        String content = request.getParameter("content");
+        
+        if (title.equals("") || content.equals(""))
         {
-            String path = getServletContext().getRealPath("/WEB-INF/note.txt");
-            PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(path, false))); 
-            
-            pw.write(title);
-            pw.write(content);
-        } catch (Exception e)
-        {
-            
+            request.setAttribute("emptyInput", "Please fill both the inputs");
+            getServletContext().getRequestDispatcher("/WEB-INF/editnote.jsp")
+            .forward(request, response);
         }
-        getServletContext().getRequestDispatcher("/WEB-INF/viewnote.jsp")
-                .forward(request, response);
+        else 
+        {
+            try
+            {
+                String path = getServletContext().getRealPath("/WEB-INF/note.txt");
+                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(path, true)));
+
+                pw.write(title);
+                pw.write(content);
+
+                note2 = new Note(title, content);
+                request.setAttribute("note", note2);
+
+    //            Closing the file after writing into it
+                pw.close();
+            } catch (Exception e)
+            {
+
+            }
+            getServletContext().getRequestDispatcher("/WEB-INF/viewnote.jsp")
+                    .forward(request, response);
+        }
     }
 }
